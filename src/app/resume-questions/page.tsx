@@ -4,12 +4,14 @@ import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 import { GlobalWorkerOptions } from "pdfjs-dist/legacy/build/pdf";
 GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 import * as mammoth from "mammoth";
+import Link from "next/link";
+import Image from "next/image";
 
 // ⚠️ Move keys to env variables in real apps!
 const AZURE_OPENAI_API_KEY = "YOUR_API_KEY";
 const AZURE_DEPLOYMENT = "gpt-4.1";
 const AZURE_API_VERSION = "2024-02-15-preview";
-const AZURE_ENDPOINT = `YOUR_DOMAIN.COMopenai/deployments/${AZURE_DEPLOYMENT}/chat/completions?api-version=${AZURE_API_VERSION}`;
+const AZURE_ENDPOINT = `YOUR_DOMAIN.COM/openai/deployments/${AZURE_DEPLOYMENT}/chat/completions?api-version=${AZURE_API_VERSION}`;
 
 
 export default function ResumeQuestionsPage() {
@@ -115,7 +117,7 @@ export default function ResumeQuestionsPage() {
       localStorage.setItem("practiceQuestions", JSON.stringify(qs));
       // Navigate to speech-feedback with flag. Use router if available, fallback to window.location
       if (typeof window !== "undefined") {
-        window.location.href = "/speech-feedback?practice=1";
+        window.location.href = "/interview?practice=1";
       }
     } catch (err: any) {
       setError(err.message || "Unknown error");
@@ -132,76 +134,122 @@ export default function ResumeQuestionsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-zinc-900 py-10 px-2 flex flex-col items-center transition-colors">
-      <div className="w-full flex flex-col lg:flex-row gap-8 max-w-5xl transition-all">
-        <div className="bg-white dark:bg-zinc-800 rounded-2xl shadow-lg border border-gray-200 dark:border-zinc-700 p-6 sm:p-8 w-full max-w-xl flex flex-col transition-colors">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-2xl">✨</span>
-            <span className="text-2xl font-bold text-gray-900 dark:text-white">Personalize Your Interview</span>
+  <div className="min-h-screen bg-black dark:bg-black flex flex-col transition-colors">
+    
+    {/* Navbar */}
+    <header className="w-full bg-black text-white shadow-lg">
+  <div className="flex justify-between items-center px-4 sm:px-6 py-4">
+    
+    {/* Logo (flush left) */}
+    <Link href="/" className="cursor-pointer flex items-center">
+      <Image
+        src="/images/sensai-logo.svg"
+        alt="SensAI Logo"
+        width={120}
+        height={40}
+        className="w-[90px] sm:w-[100px] md:w-[120px] h-auto"
+        priority
+      />
+    </Link>
+
+  </div>
+</header>
+
+    {/* Main Content */}
+    <main className="flex-grow py-8 px-4 sm:px-6 flex flex-col items-center">
+      <div className="w-full flex flex-col lg:flex-row gap-8 max-w-5xl">
+
+        {/* Personalize Section */}
+        <div className="bg-white dark:bg-[#1B202B] rounded-2xl p-6 sm:p-8 w-full flex flex-col transition-colors shadow-lg">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-2xl sm:text-3xl">✨</span>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+              Personalize Your Interview
+            </h2>
           </div>
-          <div className="mb-2 text-gray-600 dark:text-zinc-300">
-            <span>Select one or provide both: </span>
-            <ul className="list-disc pl-6 text-sm mt-1 text-gray-500 dark:text-zinc-400">
-              <li>Upload your <b>Resume</b> (<span className="font-mono">.pdf</span>, <span className="font-mono">.docx</span>, <span className="font-mono">.txt</span>)</li>
-              <li>Or type a <b>Topic/Role/Skill</b></li>
-            </ul>
-          </div>
-          <div className="my-4">
-            <label className="block font-medium text-gray-800 dark:text-zinc-200 mb-1">Resume <span className="text-xs text-gray-400">(optional)</span></label>
+
+          <p className="text-gray-600 dark:text-gray-200 mb-4 leading-relaxed text-sm sm:text-base">
+            Select one or provide both:
+          </p>
+          <ul className="list-disc pl-5 text-xs sm:text-sm text-gray-500 dark:text-gray-300 space-y-1 mb-6">
+            <li>
+              Upload your <b>Resume</b> (<code>.pdf</code>, <code>.docx</code>, <code>.txt</code>)
+            </li>
+            <li>
+              Or type a <b>Topic / Role / Skill</b>
+            </li>
+          </ul>
+
+          {/* Resume Upload */}
+          <div className="mb-6">
+            <label className="block font-medium text-gray-800 dark:text-gray-100 mb-2 text-sm sm:text-base">
+              Resume <span className="text-xs text-gray-400"></span>
+            </label>
             <input
               type="file"
               accept=".pdf,.docx,.txt"
-              className="block file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-zinc-700 dark:file:text-zinc-100 dark:file:hover:bg-zinc-600 transition"
+              className="block w-full file:mr-3 sm:file:mr-4 file:py-1 sm:file:py-2 file:px-3 sm:file:px-4 file:rounded-lg file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 dark:file:bg-zinc-700 dark:file:text-white transition"
               onChange={handleFileChange}
               disabled={loading || topic.trim().length > 0}
             />
-            {fileName && <span className="text-xs text-gray-600 dark:text-zinc-300">{fileName}</span>}
+            {fileName && <span className="text-xs text-gray-200 dark:text-gray-300 mt-2 block truncate">{fileName}</span>}
           </div>
-          <div className="mb-4">
-            <label className="block font-medium text-gray-800 dark:text-zinc-200 mb-1">Topic/Preference <span className="text-xs text-gray-400">(optional)</span></label>
+
+          {/* Topic Input */}
+          <div className="mb-6">
+            <label className="block font-medium text-gray-800 dark:text-gray-100 mb-2 text-sm sm:text-base">
+              Topic / Preference <span className="text-xs text-gray-400">(optional)</span>
+            </label>
             <textarea
               rows={3}
               value={topic}
               onChange={handleTopicChange}
               placeholder="E.g. Frontend, React, Leadership, etc"
-              className="w-full rounded border border-gray-300 dark:border-zinc-600 px-3 py-2 bg-gray-100 dark:bg-zinc-700 text-gray-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 dark:focus:ring-blue-500 transition resize-none"
+              className="w-full rounded-lg border border-gray-300 dark:border-zinc-600 px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 transition resize-none text-sm sm:text-base"
               disabled={loading || !!file}
             />
           </div>
+
+          {/* Buttons */}
           <button
             onClick={handleSubmit}
-            className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white text-lg py-2 rounded font-semibold shadow disabled:opacity-50 transition"
+            className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white text-sm sm:text-lg py-2 sm:py-3 rounded-lg font-semibold shadow-lg disabled:opacity-50 transition"
             disabled={loading}
           >
             {loading ? "Generating..." : "Start Interview"}
           </button>
-          {(error) && (
-            <button
-              onClick={resetAll}
-              className="text-gray-400 dark:text-zinc-400 hover:underline text-xs mt-3"
-              disabled={loading}
-            >
-              Reset
-            </button>
-          )}
+
           {error && (
-            <div className="mt-4 text-red-600 dark:text-red-400 text-sm text-center">{error}</div>
+            <>
+              <button
+                onClick={resetAll}
+                className="text-gray-400 dark:text-gray-400 hover:underline text-xs mt-4"
+                disabled={loading}
+              >
+                Reset
+              </button>
+              <div className="mt-3 text-red-600 dark:text-red-400 text-sm text-center">{error}</div>
+            </>
           )}
         </div>
-        <div className="bg-white dark:bg-zinc-800 rounded-2xl shadow-lg border border-gray-200 dark:border-zinc-700 p-6 sm:p-8 w-full max-w-xl flex flex-col items-center justify-center transition-colors">
-          <div className="text-2xl font-bold mb-2 text-gray-900 dark:text-white text-center">Practice a Random Question</div>
-          <div className="text-gray-500 dark:text-zinc-400 mb-6 text-center text-base">
-            Don&apos;t have a resume or preferred topic?<br /> Try out a random interview question instantly!
-          </div>
+
+        {/* Random Question Section */}
+        <div className="bg-white dark:bg-[#1B202B] rounded-2xl p-6 sm:p-8 w-full flex flex-col items-center justify-center transition-colors shadow-lg text-center">
+          <h2 className="text-xl sm:text-2xl font-bold mb-3 text-gray-900 dark:text-white">
+            Practice a Random Question
+          </h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm sm:text-base leading-relaxed">
+            Don&apos;t have a resume or preferred topic? <br />
+            Try out a random interview question instantly!
+          </p>
           <a
-            href="/speech-feedback"
-            className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white px-8 py-3 rounded text-lg font-medium shadow transition focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-400/60"
-            tabIndex={0}
+            href="/interview"
+            className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg text-sm sm:text-lg font-medium shadow-lg transition focus:outline-none focus:ring-4 focus:ring-blue-400/60"
           >
             Start Practicing Now
           </a>
         </div>
       </div>
-    </div>
-  );
-}
+    </main>
+  </div>
+);
