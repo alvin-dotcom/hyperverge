@@ -10,6 +10,7 @@ import CreateCourseDialog from "@/components/CreateCourseDialog";
 import SchoolPickerDialog from "@/components/SchoolPickerDialog";
 import { ChevronDown, Plus, X, Book, School } from "lucide-react";
 import { Cohort } from "@/types";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
     showCreateCourseButton?: boolean;
@@ -171,6 +172,7 @@ export function Header({
         }
     };
 
+
     return (
         <header className="w-full px-3 py-4 bg-black text-white">
             <div className="max-w-full mx-auto flex justify-between items-center">
@@ -234,10 +236,10 @@ export function Header({
                     <>
                         {showTryDemoButton && (
                             <button
-                                onClick={handleTryDemoClick}
+                                onClick={() => window.location.href = "/dashboard"}
                                 className="hidden md:block px-6 py-3 bg-white/20 text-white text-sm font-medium rounded-full hover:bg-white/30 cursor-pointer"
                             >
-                                Try a demo
+                                Dashboard
                             </button>
                         )}
                         {showCreateCourseButton && (
